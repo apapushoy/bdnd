@@ -1,0 +1,2 @@
+wallet address: 1BZhFvtPaRaX6Scy1TxZDUchRWF8UwMmgW
+signature: H10KdBKZcpjSNEkss9QTO4PfHJJX6qHGV+2rmc9kfF1HILG4zkIJLtpV3CimfUt84GVerBxnrDgDFipMUiSRucw=
