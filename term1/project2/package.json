@@ -1,0 +1,19 @@
+{
+  "name": "private_blockchain",
+  "version": "1.0.0",
+  "description": "simple private blockchain implementation",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "blockchain",
+    "private"
+  ],
+  "author": "Alex Papushoy",
+  "license": "ISC",
+  "dependencies": {
+    "crypto-js": "^3.1.9-1",
+    "level": "^4.0.0"
+  }
+}
