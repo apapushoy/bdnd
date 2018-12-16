@@ -7,4 +7,4 @@ class Block {
     this.previousBlockHash = ''
   }
 }
-module.exports.Block = Block
+module.exports = Block
