@@ -10,8 +10,10 @@ class Blockchain {
   }
 
   async init () {
-    if (this.getBlockHeight() === 0) {
+    if ((await this.getBlockHeight()) === 0) {
       await this.addData('Genesis block')
+    } else {
+      this.bestBlock = await this.getBestBlock()
     }
     return true
   }
@@ -21,17 +23,16 @@ class Blockchain {
   }
 
   async addBlock (newBlock) {
-    if (this.getBlockHeight() > 0) { // only ever false for the genesis block
-      const bestBlock = await this.getBestBlock()
-      newBlock.previousBlockHash = bestBlock.hash
+    if ((await this.getBlockHeight()) > 0) { // only ever false for the genesis block
+      newBlock.previousBlockHash = this.bestBlock.hash
     }
-    newBlock.height = this.getBlockHeight()
+    newBlock.height = await this.getBlockHeight()
     newBlock.time = new Date().getTime().toString().slice(0, -3)
     newBlock.hash = this.getHash(newBlock)
     await this.chainStore.store(JSON.stringify(newBlock))
     if (this.logLevel >= 1) console.log('added block at ' + newBlock.height)
     this.bestBlock = newBlock
-    return this.getBlockHeight()
+    return newBlock.height
   }
 
   getHash (obj) {
@@ -39,8 +40,7 @@ class Blockchain {
   }
 
   async getBestBlock () {
-    return this.bestBlock
-    // return this.getBlock(this.getBlockHeight() - 1)
+    return this.getBlock((await this.getBlockHeight()) - 1)
   }
 
   // Get Block By Height
@@ -51,13 +51,8 @@ class Blockchain {
   }
 
   // Get block height, it is auxiliar method that return the height of the blockchain
-  getBlockHeight () {
-    /*
-    since there is no consensus and this is a private chain, I assume
-    I am the only writer to the chain and therefore the number of entries will
-    not change behind my back.
-    */
-    return this.chainStore.numEntries
+  async getBlockHeight () {
+    return this.chainStore.countNumEntries()
   }
 
   // Validate if Block is being tampered by Block Height
@@ -71,7 +66,8 @@ class Blockchain {
   // Validate Blockchain
   async validateChain () {
     var promises = [] // may not be the best idea on a large chain
-    for (let i = 0; i < this.getBlockHeight(); ++i) {
+    const nBlocks = await this.getBlockHeight()
+    for (let i = 0; i < nBlocks; ++i) {
       promises.push(this.validateBlock(i))
     }
     var results = await Promise.all(promises)

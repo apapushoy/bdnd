@@ -3,36 +3,25 @@ class Storage {
   constructor (path, logLevel) {
     this.logLevel = logLevel
     this.db = level(path)
-    this.numEntries = 0
-    this.readyForWriting = false
-  }
-
-  async init () {
-    this.readyForWriting = await this.countNumEntries()
-    return this.readyForWriting
   }
 
   countNumEntries () {
-    let self = this
+    let k = 0
     return new Promise((resolve, reject) => {
       this.db.createKeyStream()
-        .on('data', data => { ++self.numEntries })
+        .on('data', data => { ++k })
         .on('error', err => { reject(err) })
-        .on('close', () => { resolve(true) })
+        .on('close', () => { resolve(k) })
     })
   }
 
   async store (data) {
-    if (!this.readyForWriting) {
-      throw new Error('not ready for writing')
-    }
-    await this.storeWithKey(this.numEntries, data)
+    await this.storeWithKey(await this.countNumEntries(), data)
   }
 
   async storeWithKey (key, data) {
     if (this.logLevel >= 2) console.log('storing `' + key + '` -> `' + data + '`')
     await this.db.put(key, data)
-    ++this.numEntries
   }
 
   async get (key) {
@@ -56,8 +45,6 @@ class Storage {
   }
 }
 async function makeStorageAtPath (path, logLevel) {
-  var s = new Storage(path, logLevel)
-  await s.init()
-  return s
+  return new Storage(path, logLevel)
 }
 module.exports.makeAtPath = makeStorageAtPath
