@@ -16,15 +16,13 @@ class Storage {
   }
 
   getByHash (hash) {
-    var block = null
     return new Promise((resolve, reject) => {
       this.db.createValueStream()
         .on('data', data => {
           let blockData = JSON.parse(data)
-          if (blockData.hash === hash) block = blockData
+          if (blockData.hash === hash) resolve(blockData)
         })
         .on('error', err => { reject(err) })
-        .on('close', () => { resolve(block) })
     })
   }
 
