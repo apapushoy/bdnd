@@ -11,10 +11,15 @@ app.use(bodyParser.json())
 const port = 8000
 
 const mempool = new Mempool()
-const devBypassValidation = false
 
 function updateBlockWithDecodedStory (block) {
   block.body.star.storyDecoded = hex2ascii(block.body.star.story)
+}
+
+async function getRegistrationByNumber (chain, height) {
+  let block = await chain.getBlock(height)
+  updateBlockWithDecodedStory(block)
+  return block
 }
 
 const main = async () => {
@@ -24,39 +29,52 @@ const main = async () => {
 
   app.post('/requestValidation', async (req, res) => {
     if (req.body.constructor === Object && Object.keys(req.body).length === 0) {
-      res.send(JSON.stringify({ 'error': 'must provide body' }))
+      res.send({ 'error': 'must provide body' })
     }
-    res.send(JSON.stringify(mempool.addForValidation(req.body)))
+    res.send(mempool.addForValidation(req.body))
   })
 
   app.post('/message-signature/validate', async (req, res) => {
     if (req.body.constructor === Object && Object.keys(req.body).length === 0) {
-      res.send(JSON.stringify({ 'error': 'must provide body' }))
+      res.send({ 'error': 'must provide body' })
     }
-    res.send(JSON.stringify(mempool.validateRequestByWallet(req.body)))
+    res.send(mempool.validateRequestByWallet(req.body))
   })
+
+  function makeRegistration (req) {
+    let star = req.body.star
+    return {
+      address: req.body.address,
+      star: {
+        ra: star.ra,
+        dec: star.dec,
+        story: Buffer.from(star.story).toString('hex')
+      }
+    }
+  }
 
   app.post('/block', async (req, res) => {
     if (req.body.constructor === Object && Object.keys(req.body).length === 0) {
-      res.send(JSON.stringify({ 'error': 'must provide body' }))
+      res.send({ 'error': 'must provide body' })
     }
-    if (Array.isArray(req.body.star)) res.send(JSON.stringify({ 'error': 'can only register a single star' }))
-    if (devBypassValidation || mempool.isValidRegistration(req.body.adress)) {
-      let star = req.body.star
-      let body = {
-        address: req.body.address,
-        star: {
-          ra: star.ra,
-          dec: star.dec,
-          story: Buffer.from(star.story).toString('hex')
+    if (Array.isArray(req.body.star)) res.send({ 'error': 'can only register a single star' })
+    if (mempool.isValidRegistration(req.body.address)) {
+      var regNum = null
+      try {
+        regNum = await chain.addData(makeRegistration(req))
+        try {
+          res.send(await getRegistrationByNumber(chain, regNum))
+        } catch (e) {
+          res.send({ 'error': `registered star with index ${regNum}, but failed to retrieve` })
         }
+      } catch (e) {
+        res.send({ 'error': 'failed to register due to internal error' })
+        console.log('internal error', e)
+      } finally {
+        mempool.completeRegistration(req.body.address)
       }
-      let blockHeight = await chain.addData(body)
-      let newBlock = await chain.getBlock(blockHeight)
-      updateBlockWithDecodedStory(newBlock)
-      res.send(JSON.stringify(newBlock))
     } else {
-      res.send(JSON.stringify({ 'error': 'invalid registration. please register first' }))
+      res.send({ 'error': 'invalid registration. please validate first' })
     }
   })
 
@@ -64,9 +82,9 @@ const main = async () => {
     try {
       let block = await chain.getBlockByHash(req.params.hash)
       updateBlockWithDecodedStory(block)
-      res.send(JSON.stringify(block))
+      res.send(block)
     } catch (e) {
-      res.send(JSON.stringify({ 'error': 'no such block' }))
+      res.send({ 'error': 'no such registration' })
     }
   })
 
@@ -74,22 +92,20 @@ const main = async () => {
     try {
       let blocks = await chain.getByWalletAddress(req.params.address)
       blocks.forEach(updateBlockWithDecodedStory)
-      res.send(JSON.stringify(blocks))
+      res.send(blocks)
     } catch (e) {
-      res.send(JSON.stringify({ 'error': 'no blocks registered to this address' }))
+      res.send({ 'error': 'no registrations at this address' })
     }
   })
 
   app.get('/block/:blockNum', async (req, res) => {
     try {
-      let block = await chain.getBlock(req.params.blockNum)
-      updateBlockWithDecodedStory(block)
-      res.send(JSON.stringify(block))
+      res.send(await getRegistrationByNumber(chain, req.params.blockNum))
     } catch (e) {
-      res.send(JSON.stringify({ 'error': 'no block found at this height: ' + req.params.blockNum }))
+      res.send({ 'error': 'no registration found at this height: ' + req.params.blockNum })
     }
   })
 
-  app.listen(port, () => console.log(`'listening on port ${port}!`))
+  app.listen(port, () => console.log(`listening on port ${port}!`))
 }
 main()

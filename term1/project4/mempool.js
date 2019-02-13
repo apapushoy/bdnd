@@ -21,9 +21,6 @@ class Mempool {
 
     return newRequest
   }
-  // getHash (obj) {
-  //   return SHA256(JSON.stringify(obj)).toString()
-  // }
   updateValidationTimeLeft (req) {
     const ts = new Date().getTime().toString().slice(0, -3)
     let timeElapse = ts - req.requestTimeStamp
@@ -37,6 +34,7 @@ class Mempool {
     return null
   }
   removeValidationRequest (address) {
+    delete this.timeouts[address]
     for (var i = 0; i < this.pool.length; ++i) {
       if (this.pool[i].walletAddress === address) {
         this.pool.splice(i, 1)
@@ -54,7 +52,7 @@ class Mempool {
       return { 'error': 'request expired. please resubmit for validation' }
     }
     if (bitcoinMessage.verify(existingRequest.message, req.address, req.signature)) {
-      let reg = this.makeStarRegistration(existingRequest)
+      let reg = this.makeStarValidation(existingRequest)
       this.valid.push(reg)
       this.removeValidationRequest(existingRequest.walletAddress)
       return reg
@@ -62,7 +60,7 @@ class Mempool {
       return { 'error': 'invalid signature' }
     }
   }
-  makeStarRegistration (req) {
+  makeStarValidation (req) {
     var reg = {}
     reg.registerStar = true
     reg.status = {
@@ -79,6 +77,9 @@ class Mempool {
       if (this.valid[i].status.address === addr && this.valid[i].status.messageSignature === true) return true
     }
     return false
+  }
+  completeRegistration (addr) {
+    this.valid = this.valid.filter(i => i.status.address !== addr)
   }
 }
 module.exports = Mempool
