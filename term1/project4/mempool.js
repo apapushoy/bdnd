@@ -2,9 +2,9 @@ const bitcoinMessage = require('bitcoinjs-message')
 const TimeoutRequestsWindowTime = 5 * 60 * 1000
 class Mempool {
   constructor () {
-    this.pool = []
-    this.timeouts = []
-    this.valid = []
+    this.pool = {}
+    this.timeouts = {}
+    this.valid = {}
   }
   addForValidation (body) {
     const existingRequest = this.getRequestByAddress(body.address)
@@ -15,7 +15,7 @@ class Mempool {
 
     const ts = new Date().getTime().toString().slice(0, -3)
     const newRequest = { 'walletAddress': body.address, 'requestTimeStamp': ts, 'message': `${body.address}:${ts}:starRegistry`, 'validationWindow': TimeoutRequestsWindowTime / 1000 }
-    this.pool.push(newRequest)
+    this.pool[body.address] = newRequest
     let self = this
     this.timeouts[newRequest.walletAddress] = setTimeout(() => { self.removeValidationRequest(newRequest.walletAddress) }, TimeoutRequestsWindowTime)
 
@@ -28,19 +28,14 @@ class Mempool {
     req.validationWindow = timeLeft
   }
   getRequestByAddress (addr) {
-    for (var i = 0; i < this.pool.length; ++i) {
-      if (this.pool[i].walletAddress === addr) return this.pool[i]
-    }
-    return null
+    var req = this.pool[addr]
+    if (req === undefined) return null
+    return req
   }
   removeValidationRequest (address) {
     delete this.timeouts[address]
-    for (var i = 0; i < this.pool.length; ++i) {
-      if (this.pool[i].walletAddress === address) {
-        this.pool.splice(i, 1)
-        console.log(`removed validation request for ${address}`)
-      }
-    }
+    delete this.pool[address]
+    console.log(`removed validation request for ${address}`)
   }
   validateRequestByWallet (req) {
     const existingRequest = this.getRequestByAddress(req.address)
@@ -53,7 +48,7 @@ class Mempool {
     }
     if (bitcoinMessage.verify(existingRequest.message, req.address, req.signature)) {
       let reg = this.makeStarValidation(existingRequest)
-      this.valid.push(reg)
+      this.valid[existingRequest.walletAddress] = reg
       this.removeValidationRequest(existingRequest.walletAddress)
       return reg
     } else {
@@ -73,13 +68,12 @@ class Mempool {
     return reg
   }
   isValidRegistration (addr) {
-    for (var i = 0; i < this.valid.length; ++i) {
-      if (this.valid[i].status.address === addr && this.valid[i].status.messageSignature === true) return true
-    }
-    return false
+    var valid = this.valid[addr]
+    if (valid === undefined) return false
+    return valid.status.messageSignature === true
   }
   completeRegistration (addr) {
-    this.valid = this.valid.filter(i => i.status.address !== addr)
+    delete this.valid[addr]
   }
 }
 module.exports = Mempool
