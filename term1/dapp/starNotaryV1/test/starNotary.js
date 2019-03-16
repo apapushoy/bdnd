@@ -1,5 +1,3 @@
-import 'babel-polyfill'
-
 // Importing the StartNotary Smart Contract ABI (JSON representation of the Smart Contract)
 const StarNotary = artifacts.require("StarNotary");
 
@@ -19,3 +17,30 @@ it('has correct name', async () => {
     let starName = await instance.starName.call(); // Calling the starName property
     assert.equal(starName, "Awesome Udacity Star"); // Assert if the starName property was initialized correctly
 });
+
+// Example test case, it will test is the Smart Contract function claimStar assigned the Star to the owner address
+it('can be claimed', async () => {
+    let instance = await StarNotary.deployed(); // Making sure the Smart Contract is deployed and getting the instance.
+    await instance.claimStar({from: owner}); // Calling the Smart Contract function claimStar
+    let starOwner = await instance.starOwner.call(); // Getting the owner address
+    assert.equal(starOwner, owner); // Verifying if the owner address match with owner of the address
+});
+
+// Example test case, it will test is the Smart Contract function claimStar assigned the Star to the owner address and it can be changed
+it('can change owners', async () => {
+    let instance = await StarNotary.deployed();
+    let secondUser = accounts[1];
+    await instance.claimStar({from: owner});
+    let starOwner = await instance.starOwner.call();
+    assert.equal(starOwner, owner);
+    await instance.claimStar({from: secondUser});
+    let secondOwner = await instance.starOwner.call();
+    assert.equal(secondOwner, secondUser);
+ });
+
+it('can change star name', async () => {
+  let instance = await StarNotary.deployed()
+  await instance.changeName('test star')
+  let newName = await instance.starName.call()
+  assert.equal(newName, 'test star')
+})
