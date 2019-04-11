@@ -16,7 +16,7 @@ contract ShipperRole {
 
     // In the constructor make the address that deploys this contract the 1st shipper
     constructor() public {
-        shippers_.add(msg.sender);
+        _addShipper(msg.sender);
     }
 
     // Define a modifier that checks to see if msg.sender has the appropriate role
@@ -27,7 +27,7 @@ contract ShipperRole {
 
     // Define a function 'isShipper' to check this role
     function isShipper(address account) public view returns (bool) {
-        return shippers_.has(account);
+        return Roles.has(shippers_, account);
     }
 
     // Define a function 'addShipper' that adds this role
@@ -42,13 +42,13 @@ contract ShipperRole {
 
     // Define an internal function '_addShipper' to add this role, called by 'addShipper'
     function _addShipper(address account) internal {
-        shippers_.add(account);
+        Roles.add(shippers_, account);
         emit ShipperAdded(account);
     }
 
     // Define an internal function '_removeShipper' to remove this role, called by 'removeShipper'
     function _removeShipper(address account) internal {
-        shippers_.remove(accounts);
+        Roles.remove(shippers_, account);
         emit ShipperRemoved(account);
     }
 }

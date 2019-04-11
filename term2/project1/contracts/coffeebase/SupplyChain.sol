@@ -1,17 +1,17 @@
 pragma solidity ^0.5.0;
 // Define a contract 'Supplychain'
 
-import "CustomerRole.sol";
-import "FarmerRole.sol";
-import "ShipperRole.sol";
-import "SupermarketRole.sol";
-import "Ownable.sol";
+import "../coffeeaccesscontrol/CustomerRole.sol";
+import "../coffeeaccesscontrol/FarmerRole.sol";
+import "../coffeeaccesscontrol/ShipperRole.sol";
+import "../coffeeaccesscontrol/SupermarketRole.sol";
+import "../coffeecore/Ownable.sol";
 
 
 contract SupplyChain is Ownable, CustomerRole, FarmerRole, ShipperRole, SupermarketRole {
 
     // Define 'owner'
-    address owner;
+    address owner_;
 
     // Define a variable called 'upc' for Universal Product Code (UPC)
     uint  upc;
@@ -63,20 +63,20 @@ contract SupplyChain is Ownable, CustomerRole, FarmerRole, ShipperRole, Supermar
         address customerID; // Metamask-Ethereum address of the Customer
     }
 
-    event ReadyForHarvest(uint upc);
-    event Harvested(uint upc);
-    event ForSaleByFarmer(uint upc);
-    event SoldToBuyer(uint upc);
-    event TransferredToBuyer(uint upc);
-    event AwaitingShipping(uint upc);
-    event Shipping(uint upc);
-    event Shipped(uint upc);
-    event ForSaleByBuyer(uint upc);
-    event SoldToCustomer(uint upc);
+    event ReadyForHarvest(uint _upc);
+    event Harvested(uint _upc);
+    event ForSaleByFarmer(uint _upc);
+    event SoldToBuyer(uint _upc);
+    event TransferredToBuyer(uint _upc);
+    event AwaitingShipping(uint _upc);
+    event Shipping(uint _upc);
+    event Shipped(uint _upc);
+    event ForSaleByBuyer(uint _upc);
+    event SoldToCustomer(uint _upc);
 
     // Define a modifer that checks to see if msg.sender == owner of the contract
     modifier onlyOwner() {
-        require(msg.sender == owner);
+        require(msg.sender == owner_);
         _;
     }
 
@@ -97,7 +97,8 @@ contract SupplyChain is Ownable, CustomerRole, FarmerRole, ShipperRole, Supermar
         _;
         uint _price = items[_upc].productPrice;
         uint amountToReturn = msg.value - _price;
-        recepient.transfer(amountToReturn);
+        address payable payAddr = address(uint160(recepient));
+        payAddr.transfer(amountToReturn);
     }
 
     modifier readyForHarvest(uint _upc) {
@@ -111,42 +112,42 @@ contract SupplyChain is Ownable, CustomerRole, FarmerRole, ShipperRole, Supermar
         _;
     }
 
-    modifier forSaleByFarmer(uint upc) {
+    modifier forSaleByFarmer(uint _upc) {
         require(items[_upc].itemState == State.ForSaleByFarmer);
         _;
     }
 
-    modifier soldToBuyer(uint upc) {
+    modifier soldToBuyer(uint _upc) {
         require(items[_upc].itemState == State.SoldToBuyer);
         _;
     }
 
-    modifier transferredToBuyer(uint upc) {
+    modifier transferredToBuyer(uint _upc) {
         require(items[_upc].itemState == State.TransferredToBuyer);
         _;
     }
 
-    modifier awaitingShipping(uint upc) {
+    modifier awaitingShipping(uint _upc) {
         require(items[_upc].itemState == State.AwaitingShipping);
         _;
     }
 
-    modifier shipping(uint upc) {
+    modifier shipping(uint _upc) {
         require(items[_upc].itemState == State.Shipping);
         _;
     }
 
-    modifier shipped(uint upc) {
+    modifier isShipped(uint _upc) {
         require(items[_upc].itemState == State.Shipped);
         _;
     }
 
-    modifier isForSaleByBuyer(uint upc) {
+    modifier isForSaleByBuyer(uint _upc) {
         require(items[_upc].itemState == State.ForSaleByBuyer);
         _;
     }
 
-    modifier soldToCustomer(uint upc) {
+    modifier soldToCustomer(uint _upc) {
         require(items[_upc].itemState == State.SoldToCustomer);
         _;
     }
@@ -155,15 +156,16 @@ contract SupplyChain is Ownable, CustomerRole, FarmerRole, ShipperRole, Supermar
     // and set 'sku' to 1
     // and set 'upc' to 1
     constructor() public payable {
-        owner = msg.sender;
+        owner_ = msg.sender;
         sku = 1;
         upc = 1;
     }
 
     // Define a function 'kill' if required
     function kill() public {
-        if (msg.sender == owner) {
-            selfdestruct(owner);
+        address payable addr = address(uint160(owner_));
+        if (msg.sender == addr) {
+            selfdestruct(addr);
         }
     }
 
@@ -173,112 +175,113 @@ contract SupplyChain is Ownable, CustomerRole, FarmerRole, ShipperRole, Supermar
         public
         onlyFarmer
     {
-        uint prodId = _upc*(max(1, 10^floor(log10(sku)))) + sku;
-        items[_upc] = Item(sku, _upc, msg.sender, _originFarmerID, _originFarmName, _originFarmInformation,
-        _originFarmLatitude, _originFarmLongitude, prodId, _productNotes);
-        items[_upc].itemState = DEFAULT_STATE;
+        uint prodId = _upc * 10000 + sku;
+        items[_upc] = CoconutUnit(sku, _upc, msg.sender, _originFarmerID, _originFarmName, _originFarmInformation,
+        _originFarmLatitude, _originFarmLongitude, prodId, _productNotes, 0, DEFAULT_STATE, address(0), address(0), address(0));
         sku = sku + 1;
         emit ReadyForHarvest(_upc);
     }
 
     // Define a function 'harvestItem' that allows a farmer to mark an item 'Harvested'
-    function harvestItem(uint upc)
+    function harvestItem(uint _upc)
         public
         onlyFarmer
-        readyForHarvest(upc)
+        readyForHarvest(_upc)
     {
-        items[upc].itemState = State.Harvested;
-        emit Harvested(upc);
+        items[_upc].itemState = State.Harvested;
+        emit Harvested(_upc);
     }
 
-    function putUpForSale(uint upc, uint price)
+    function putUpForSale(uint _upc, uint price)
         public
         onlyFarmer
-        harvested(upc)
+        harvested(_upc)
     {
         require(price > 0, "Invalid price");
-        items[upc].itemState = State.ForSaleByFarmer;
-        items[upc].productPrice = price;
-        emit ForSaleByFarmer(upc);
+        items[_upc].itemState = State.ForSaleByFarmer;
+        items[_upc].productPrice = price;
+        emit ForSaleByFarmer(_upc);
     }
 
-    function buyerBuysCoconuts(uint upc)
+    function buyerBuysCoconuts(uint _upc)
         public
         onlySupermarket
-        forSaleByFarmer(upc)
+        forSaleByFarmer(_upc)
         payable
-        paidEnough(items[upc].productPrice)
-        refundChange(upc, msg.sender)
+        paidEnough(items[_upc].productPrice)
+        refundChange(_upc, msg.sender)
     {
-        items[upc].itemState = State.SoldToBuyer;
-        items[upc].superMarketID = msg.sender;
-        items[upc].originFarmerID.transfer(items[upc].productPrice);
-        emit SoldToBuyer(upc);
+        items[_upc].itemState = State.SoldToBuyer;
+        items[_upc].superMarketID = msg.sender;
+        address payable payAddr = address(uint160(items[_upc].originFarmerID));
+        payAddr.transfer(items[_upc].productPrice);
+        emit SoldToBuyer(_upc);
     }
 
-    function transferToBuyer(uint upc)
+    function transferToBuyer(uint _upc)
     public
     onlySupermarket
-    soldToBuyer(upc)
+    soldToBuyer(_upc)
     {
-        items[upc].itemState = State.TransferredToBuyer;
-        items[upc].ownerID = msg.sender;
-        emit TransferredToBuyer(upc);
+        items[_upc].itemState = State.TransferredToBuyer;
+        items[_upc].ownerID = msg.sender;
+        emit TransferredToBuyer(_upc);
     }
 
-    function submitShipment(uint upc, address shipper)
+    function submitShipment(uint _upc, address shipper)
     public
     onlySupermarket
-    transferredToBuyer(upc)
+    transferredToBuyer(_upc)
     {
-        items[upc].itemState = State.AwaitingShipping;
-        items[upc].shipperID = shipper;
-        items[upc].ownerID = shipper;
-        emit AwaitingShipping(upc);
+        items[_upc].itemState = State.AwaitingShipping;
+        items[_upc].shipperID = shipper;
+        items[_upc].ownerID = shipper;
+        emit AwaitingShipping(_upc);
     }
 
-    function ship(uint upc)
+    function ship(uint _upc)
     public
     onlyShipper
-    awaitingShipping(upc)
+    awaitingShipping(_upc)
     {
-        items[upc].itemState = State.Shipping;
-        emit Shipping(upc);
+        items[_upc].itemState = State.Shipping;
+        emit Shipping(_upc);
     }
 
-    function shipped(uint upc)
+    function shipped(uint _upc)
     public
     onlyShipper
-    shipping(upc)
+    shipping(_upc)
     {
-        items[upc].itemState = State.Shipped;
-        items[upc].ownerID = items[upc].superMarketID;
-        emit Shipped(upc);
+        items[_upc].itemState = State.Shipped;
+        items[_upc].ownerID = items[_upc].superMarketID;
+        emit Shipped(_upc);
     }
 
-    function forSaleByBuyer(uint upc)
+    function forSaleByBuyer(uint _upc)
     public
     onlySupermarket
-    shipped(upc)
+    isShipped(_upc)
     {
-        items[upc].itemState = State.ForSaleByBuyer;
-        items[upc].productPrice = items[upc].productPrice * (1 + (MARKUP_FACTOR / 100));
-        emit ForSaleByBuyer(upc);
+        items[_upc].itemState = State.ForSaleByBuyer;
+        items[_upc].productPrice = items[_upc].productPrice * (1 + (MARKUP_FACTOR / 100));
+        emit ForSaleByBuyer(_upc);
     }
 
-    function customerBuysCoconuts(uint upc)
+    function customerBuysCoconuts(uint _upc)
         public
         onlyCustomer
-        isForSaleByBuyer(upc)
+        isForSaleByBuyer(_upc)
         payable
-        paidEnough(items[upc].productPrice)
-        refundChange(upc, msg.sender)
+        paidEnough(items[_upc].productPrice)
+        refundChange(_upc, msg.sender)
     {
-        items[upc].itemState = State.SoldToCustomer;
-        items[upc].ownerID = msg.sender;
+        items[_upc].itemState = State.SoldToCustomer;
+        items[_upc].ownerID = msg.sender;
         items[_upc].customerID = msg.sender;
-        items[upc].superMarketID.transfer(items[upc].productPrice);
-        emit SoldToCustomer(upc);
+        address payable payAddr = address(uint160(items[_upc].superMarketID));
+        payAddr.transfer(items[_upc].productPrice);
+        emit SoldToCustomer(_upc);
     }
 
     function fetchItemBufferOne(uint _upc) public view returns
@@ -287,10 +290,10 @@ contract SupplyChain is Ownable, CustomerRole, FarmerRole, ShipperRole, Supermar
         uint    itemUPC,
         address ownerID,
         address originFarmerID,
-        string  originFarmName,
-        string  originFarmInformation,
-        string  originFarmLatitude,
-        string  originFarmLongitude
+        string  memory originFarmName,
+        string  memory originFarmInformation,
+        string  memory originFarmLatitude,
+        string  memory originFarmLongitude
     )
     {
         itemSKU = items[_upc].sku;
@@ -321,7 +324,7 @@ contract SupplyChain is Ownable, CustomerRole, FarmerRole, ShipperRole, Supermar
         uint    itemSKU,
         uint    itemUPC,
         uint    productID,
-        string  productNotes,
+        string  memory productNotes,
         uint    productPrice,
         uint    itemState,
         address shipperID,
@@ -334,7 +337,7 @@ contract SupplyChain is Ownable, CustomerRole, FarmerRole, ShipperRole, Supermar
         productID = items[_upc].productID;
         productNotes = items[_upc].productNotes;
         productPrice = items[_upc].productPrice;
-        itemState = items[_upc].itemState;
+        itemState = uint(items[_upc].itemState);
         shipperID = items[_upc].shipperID;
         superMarketID = items[_upc].superMarketID;
         customerID = items[_upc].customerID;

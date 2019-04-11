@@ -27,7 +27,7 @@ contract SupermarketRole {
 
     // Define a function 'isSupermarket' to check this role
     function isSupermarket(address account) public view returns (bool) {
-        return superMarkets_.has(account);
+        return Roles.has(superMarkets_, account);
     }
 
     // Define a function 'addSupermarket' that adds this role
@@ -42,13 +42,13 @@ contract SupermarketRole {
 
     // Define an internal function '_addSupermarket' to add this role, called by 'addSupermarket'
     function _addSupermarket(address account) internal {
-        superMarkets_.add(account);
+        Roles.add(superMarkets_, account);
         emit SupermarketAdded(account);
     }
 
     // Define an internal function '_removeSupermarket' to remove this role, called by 'removeSupermarket'
     function _removeSupermarket(address account) internal {
-        superMarkets_.remove(account);
+        Roles.remove(superMarkets_, account);
         emit SupermarketRemoved(account);
     }
 }

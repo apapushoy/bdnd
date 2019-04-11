@@ -27,7 +27,7 @@ contract CustomerRole {
 
     // Define a function 'isCustomer' to check this role
     function isCustomer(address account) public view returns (bool) {
-        return customers_.has(account);
+        return Roles.has(customers_, account);
     }
 
     // Define a function 'addCustomer' that adds this role
@@ -42,13 +42,13 @@ contract CustomerRole {
 
     // Define an internal function '_addCustomer' to add this role, called by 'addCustomer'
     function _addCustomer(address account) internal {
-        customers_.add(account);
+        Roles.add(customers_, account);
         emit CustomerAdded(account);
     }
 
     // Define an internal function '_removeCustomer' to remove this role, called by 'removeCustomer'
     function _removeCustomer(address account) internal {
-        customers_.remove(account);
+        Roles.remove(customers_, account);
         emit CustomerRemoved(account);
     }
 }

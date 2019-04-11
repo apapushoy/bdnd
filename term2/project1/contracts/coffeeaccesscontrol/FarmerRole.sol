@@ -28,7 +28,7 @@ contract FarmerRole {
 
     // Define a function 'isFarmer' to check this role
     function isFarmer(address account) public view returns (bool) {
-        return farmers.has(account);
+        return Roles.has(farmers, account);
     }
 
     // Define a function 'addFarmer' that adds this role
@@ -43,17 +43,13 @@ contract FarmerRole {
 
     // Define an internal function '_addFarmer' to add this role, called by 'addFarmer'
     function _addFarmer(address account) internal {
-        farmers.add(account);
+        Roles.add(farmers, account);
         emit FarmerAdded(account);
     }
 
     // Define an internal function '_removeFarmer' to remove this role, called by 'removeFarmer'
     function _removeFarmer(address account) internal {
-        farmers.remove(account);
+        Roles.remove(farmers, account);
         emit FarmerRemoved(account);
-    }
-
-    function buyCoconut() internal {
-
     }
 }
