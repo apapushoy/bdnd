@@ -1,0 +1,4 @@
+# Deployment
+* Network: Rinkeby
+* Contract address: 0x15123100B875562B819da6e8d5E991A245eA63C3
+* Tx hash: 0x6c59d8e262b493e6722a6e932824426e3074332c5a6262bf64d87ea9c1110a70
