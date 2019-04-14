@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.2;
 // Define a contract 'Supplychain'
 
 import "../coffeeaccesscontrol/CustomerRole.sol";
@@ -6,9 +6,11 @@ import "../coffeeaccesscontrol/FarmerRole.sol";
 import "../coffeeaccesscontrol/ShipperRole.sol";
 import "../coffeeaccesscontrol/SupermarketRole.sol";
 import "../coffeecore/Ownable.sol";
+import "../../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 
 contract SupplyChain is Ownable, CustomerRole, FarmerRole, ShipperRole, SupermarketRole {
+    using SafeMath for uint256;
 
     // Define 'owner'
     address owner_;
@@ -76,19 +78,19 @@ contract SupplyChain is Ownable, CustomerRole, FarmerRole, ShipperRole, Supermar
 
     // Define a modifer that checks to see if msg.sender == owner of the contract
     modifier onlyOwner() {
-        require(msg.sender == owner_);
+        require(msg.sender == owner_, "must be owner");
         _;
     }
 
     // Define a modifer that verifies the Caller
     modifier verifyCaller (address _address) {
-        require(msg.sender == _address);
+        require(msg.sender == _address, "unexpected address");
         _;
     }
 
     // Define a modifier that checks if the paid amount is sufficient to cover the price
     modifier paidEnough(uint _price) {
-        require(msg.value >= _price);
+        require(msg.value >= _price, "insufficient payment");
         _;
     }
 
@@ -102,53 +104,53 @@ contract SupplyChain is Ownable, CustomerRole, FarmerRole, ShipperRole, Supermar
     }
 
     modifier readyForHarvest(uint _upc) {
-        require(items[_upc].itemState == State.ReadyForHarvest);
+        require(items[_upc].itemState == State.ReadyForHarvest, "not ready for harvest");
         _;
     }
 
     // Define a modifier that checks if an item.state of a upc is Harvested
     modifier harvested(uint _upc) {
-        require(items[_upc].itemState == State.Harvested);
+        require(items[_upc].itemState == State.Harvested, "not harvested");
         _;
     }
 
     modifier forSaleByFarmer(uint _upc) {
-        require(items[_upc].itemState == State.ForSaleByFarmer);
+        require(items[_upc].itemState == State.ForSaleByFarmer, "not for sale by farmer");
         _;
     }
 
     modifier soldToBuyer(uint _upc) {
-        require(items[_upc].itemState == State.SoldToBuyer);
+        require(items[_upc].itemState == State.SoldToBuyer, "not sold to buyer");
         _;
     }
 
     modifier transferredToBuyer(uint _upc) {
-        require(items[_upc].itemState == State.TransferredToBuyer);
+        require(items[_upc].itemState == State.TransferredToBuyer, "not transferred to buyer");
         _;
     }
 
     modifier awaitingShipping(uint _upc) {
-        require(items[_upc].itemState == State.AwaitingShipping);
+        require(items[_upc].itemState == State.AwaitingShipping, "not awaiting shipping");
         _;
     }
 
     modifier shipping(uint _upc) {
-        require(items[_upc].itemState == State.Shipping);
+        require(items[_upc].itemState == State.Shipping, "not shipping");
         _;
     }
 
     modifier isShipped(uint _upc) {
-        require(items[_upc].itemState == State.Shipped);
+        require(items[_upc].itemState == State.Shipped, "not shipped");
         _;
     }
 
     modifier isForSaleByBuyer(uint _upc) {
-        require(items[_upc].itemState == State.ForSaleByBuyer);
+        require(items[_upc].itemState == State.ForSaleByBuyer, "not for sale by buyer");
         _;
     }
 
     modifier soldToCustomer(uint _upc) {
-        require(items[_upc].itemState == State.SoldToCustomer);
+        require(items[_upc].itemState == State.SoldToCustomer, "not sold to customer");
         _;
     }
 
@@ -176,7 +178,7 @@ contract SupplyChain is Ownable, CustomerRole, FarmerRole, ShipperRole, Supermar
         onlyFarmer
     {
         uint prodId = _upc * 10000 + sku;
-        items[_upc] = CoconutUnit(sku, _upc, msg.sender, _originFarmerID, _originFarmName, _originFarmInformation,
+        items[_upc] = CoconutUnit(sku, _upc, _originFarmerID, _originFarmerID, _originFarmName, _originFarmInformation,
         _originFarmLatitude, _originFarmLongitude, prodId, _productNotes, 0, DEFAULT_STATE, address(0), address(0), address(0));
         sku = sku + 1;
         emit ReadyForHarvest(_upc);
@@ -264,7 +266,8 @@ contract SupplyChain is Ownable, CustomerRole, FarmerRole, ShipperRole, Supermar
     isShipped(_upc)
     {
         items[_upc].itemState = State.ForSaleByBuyer;
-        items[_upc].productPrice = items[_upc].productPrice * (1 + (MARKUP_FACTOR / 100));
+        // items[_upc].productPrice = items[_upc].productPrice + (items[_upc].productPrice * MARKUP_FACTOR / 100);
+        items[_upc].productPrice = items[_upc].productPrice.add(items[_upc].productPrice.mul(MARKUP_FACTOR).div(100));
         emit ForSaleByBuyer(_upc);
     }
 

@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.2;
 
 // Import the library 'Roles'
 import "./Roles.sol";
@@ -21,7 +21,7 @@ contract CustomerRole {
 
     // Define a modifier that checks to see if msg.sender has the appropriate role
     modifier onlyCustomer() {
-        require(isCustomer(msg.sender));
+        require(isCustomer(msg.sender), "role violation: not a customer");
         _;
     }
 

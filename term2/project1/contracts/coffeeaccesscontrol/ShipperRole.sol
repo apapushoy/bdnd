@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.2;
 
 // Import the library 'Roles'
 import "./Roles.sol";
@@ -21,7 +21,7 @@ contract ShipperRole {
 
     // Define a modifier that checks to see if msg.sender has the appropriate role
     modifier onlyShipper() {
-        require(isShipper(msg.sender));
+        require(isShipper(msg.sender), "role violation: not a shipper");
         _;
     }
 

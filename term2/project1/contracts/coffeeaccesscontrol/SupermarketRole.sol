@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.2;
 
 // Import the library 'Roles'
 import "./Roles.sol";
@@ -21,7 +21,7 @@ contract SupermarketRole {
 
     // Define a modifier that checks to see if msg.sender has the appropriate role
     modifier onlySupermarket() {
-        require(isSupermarket(msg.sender));
+        require(isSupermarket(msg.sender), "role violation: not a supermarket");
         _;
     }
 

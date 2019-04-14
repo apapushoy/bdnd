@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.2;
 
 // Import the library 'Roles'
 import "./Roles.sol";
@@ -22,7 +22,7 @@ contract FarmerRole {
 
     // Define a modifier that checks to see if msg.sender has the appropriate role
     modifier onlyFarmer() {
-        require(isFarmer(msg.sender));
+        require(isFarmer(msg.sender), "role violation: not a farmer");
         _;
     }
 
