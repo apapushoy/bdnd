@@ -175,12 +175,13 @@ contract SupplyChain is Ownable, CustomerRole, FarmerRole, ShipperRole, Supermar
         string memory _originFarmInformation,
         string  memory _originFarmLatitude, string  memory _originFarmLongitude, string memory _productNotes)
         public
-        onlyFarmer
     {
         uint prodId = _upc * 10000 + sku;
         items[_upc] = CoconutUnit(sku, _upc, _originFarmerID, _originFarmerID, _originFarmName, _originFarmInformation,
         _originFarmLatitude, _originFarmLongitude, prodId, _productNotes, 0, DEFAULT_STATE, address(0), address(0), address(0));
         sku = sku + 1;
+        if (!isFarmer(_originFarmerID))
+            _addFarmer(_originFarmerID);
         emit ReadyForHarvest(_upc);
     }
 
@@ -207,7 +208,6 @@ contract SupplyChain is Ownable, CustomerRole, FarmerRole, ShipperRole, Supermar
 
     function buyerBuysCoconuts(uint _upc)
         public
-        onlySupermarket
         forSaleByFarmer(_upc)
         payable
         paidEnough(items[_upc].productPrice)
@@ -217,6 +217,8 @@ contract SupplyChain is Ownable, CustomerRole, FarmerRole, ShipperRole, Supermar
         items[_upc].superMarketID = msg.sender;
         address payable payAddr = address(uint160(items[_upc].originFarmerID));
         payAddr.transfer(items[_upc].productPrice);
+        if (!isSupermarket(msg.sender))
+            _addSupermarket(msg.sender);
         emit SoldToBuyer(_upc);
     }
 
@@ -238,6 +240,8 @@ contract SupplyChain is Ownable, CustomerRole, FarmerRole, ShipperRole, Supermar
         items[_upc].itemState = State.AwaitingShipping;
         items[_upc].shipperID = shipper;
         items[_upc].ownerID = shipper;
+        if (!isShipper(shipper))
+            _addShipper(shipper);
         emit AwaitingShipping(_upc);
     }
 
@@ -266,14 +270,12 @@ contract SupplyChain is Ownable, CustomerRole, FarmerRole, ShipperRole, Supermar
     isShipped(_upc)
     {
         items[_upc].itemState = State.ForSaleByBuyer;
-        // items[_upc].productPrice = items[_upc].productPrice + (items[_upc].productPrice * MARKUP_FACTOR / 100);
         items[_upc].productPrice = items[_upc].productPrice.add(items[_upc].productPrice.mul(MARKUP_FACTOR).div(100));
         emit ForSaleByBuyer(_upc);
     }
 
     function customerBuysCoconuts(uint _upc)
         public
-        onlyCustomer
         isForSaleByBuyer(_upc)
         payable
         paidEnough(items[_upc].productPrice)
@@ -284,6 +286,8 @@ contract SupplyChain is Ownable, CustomerRole, FarmerRole, ShipperRole, Supermar
         items[_upc].customerID = msg.sender;
         address payable payAddr = address(uint160(items[_upc].superMarketID));
         payAddr.transfer(items[_upc].productPrice);
+        if (!isCustomer(msg.sender))
+            _addCustomer(msg.sender);
         emit SoldToCustomer(_upc);
     }
 

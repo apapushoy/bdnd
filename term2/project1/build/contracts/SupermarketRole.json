@@ -2587,14 +2587,41 @@
       "transactionHash": "0xc0515554d135e6d1ede821e225abe1143133e16658b23e144d9b6fa1b56805a4"
     },
     "5777": {
-      "events": {},
+      "events": {
+        "0x3e8b6c25714070dcebd930fe0d9592c40580e5afd0b4e8e3727181b801e733f5": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "account",
+              "type": "address"
+            }
+          ],
+          "name": "SupermarketAdded",
+          "type": "event",
+          "signature": "0x3e8b6c25714070dcebd930fe0d9592c40580e5afd0b4e8e3727181b801e733f5"
+        },
+        "0x15d2b381eb4092b28724b6b0527f13de7431b61db9e6f8ad6c171c35afbfb544": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "account",
+              "type": "address"
+            }
+          ],
+          "name": "SupermarketRemoved",
+          "type": "event",
+          "signature": "0x15d2b381eb4092b28724b6b0527f13de7431b61db9e6f8ad6c171c35afbfb544"
+        }
+      },
       "links": {},
-      "address": "0xD9F34B9a9aC90Db41130064a7b6BD924608bE26D",
-      "transactionHash": "0x460fd64d9e42df6022de218e99ae21ac3ee6e6963ae6dbec46c7d8e5c6a121d2"
+      "address": "0x3BEf764A615C70b26358A173D175E72A0d8d8B54",
+      "transactionHash": "0xc9a4c342f0aa7291fc8deabaf7e789572a1caf92320d531d30a6d67591da9da8"
     }
   },
   "schemaVersion": "3.0.6",
-  "updatedAt": "2019-04-14T18:09:48.357Z",
+  "updatedAt": "2019-04-16T20:56:16.459Z",
   "devdoc": {
     "methods": {}
   },

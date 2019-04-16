@@ -4,16 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fair Trade Coffee</title>
+    <title>Fair Trade Coconuts</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 
 <body>
     <div class="container">
-        <h1 style="text-align: center;">Fair Trade Coffee</h1>
+        <h1 style="text-align: center;">Fair Trade Coconuts</h1>
         <hr>
-        <p style="text-align: center;">Prove the authenticity of coffee using the Ethereum blockchain.</p>
+        <p style="text-align: center;">Prove the authenticity of coconuts using the Ethereum blockchain.</p>
     </div>
 
     <div id="ftc-harvest">
@@ -29,8 +29,8 @@
             <br>
             <input type="text" id="ownerID" name="ownerID" value="0x963865f57804b38459dd4b2da2f760211a200438" size="50"><br>
             <div class=button-div>
-                <button class="btn-fetchOne" id="button" type="button" data-id="9">Fetch Data 1</button>
-                <button class="btn-fetchTwo" id="button" type="button" data-id="10">Fetch Data 2</button>
+                <button class="btn-fetchOne" id="button" type="button" data-id="11">Fetch Data 1</button>
+                <button class="btn-fetchTwo" id="button" type="button" data-id="12">Fetch Data 2</button>
             </div>
         </div>
         <div class=form-break></div>
@@ -53,10 +53,9 @@
             <br>
             <input type="text" id="originFarmLongitude" name="originFarmLongitude" value="144.341490"><br>
             <br>
-            <button class="btn-harvest" id="button" type="button" data-id="1">Harvest</button>
-            <button class="btn-process" id="button" type="button" data-id="2">Process</button>
-            <button class="btn-pack" id="button" type="button" data-id="3">Pack</button>
-            <button class="btn-forsale" id="button" type="button" data-id="4">ForSale</button>
+            <button class="btn-prep-harvest" id="button" type="button" data-id="1">Prepare for harvest</button>
+            <button class="btn-harvest" id="button" type="button" data-id="2">Harvest</button>
+            <button class="btn-sale-farmer" id="button" type="button" data-id="3">For sale by farmer</button>
         </div>
         <div class=form-break></div>
         <h2>Product Details</h2>
@@ -76,15 +75,18 @@
             <br>
             <input type="text" id="superMarketID" name="superMarketID" value="0x0fb2bfefd526966c87efa19f6693d50971763fc2"
                 size="50"><br>
-            Shipper ID
+            Customer id
             <br>
             <input type="text" id="customerID" name="customerID" value="0x5d777e9127b28fb119e81a6304278a0a21bef1c4"
                 size="50"><br>
             <br>
-            <button class="btn-buy" id="button" type="button" data-id="5">Buy</button>
-            <button class="btn-ship" id="button" type="button" data-id="6">Ship</button>
-            <button class="btn-receive" id="button" type="button" data-id="7">Receive</button>
-            <button class="btn-purchase" id="button" type="button" data-id="8">Purchase</button>
+            <button class="btn-buy-buyer" id="button" type="button" data-id="4">Buyer purchase</button>
+            <button class="btn-transfer-buyer" id="button" type="button" data-id="5">Transfer to buyer</button>
+            <button class="btn-submit-shipment" id="button" type="button" data-id="6">Submit shipment</button>
+            <button class="btn-shipping" id="button" type="button" data-id="7">Shipping</button>
+            <button class="btn-shipped" id="button" type="button" data-id="8">Shipped</button>
+            <button class="btn-sale-buyer" id="button" type="button" data-id="9">For sale by buyer</button>
+            <button class="btn-purchase-customer" id="button" type="button" data-id="10">Customer purchase</button>
         </div>
         <div class=form-break></div>
         <hr>

@@ -2587,14 +2587,41 @@
       "transactionHash": "0x5fa3b4f4de2d356b0c8eb8405e6165981859a2bfe0be9790798672c48f3acb15"
     },
     "5777": {
-      "events": {},
+      "events": {
+        "0xa6b0d643c10c5fda6645b77a5fb2e02bc2cbd3597d2a30910ca9f42db8b948ca": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "account",
+              "type": "address"
+            }
+          ],
+          "name": "ShipperAdded",
+          "type": "event",
+          "signature": "0xa6b0d643c10c5fda6645b77a5fb2e02bc2cbd3597d2a30910ca9f42db8b948ca"
+        },
+        "0x4098c33ee7259bdc6331fa574feb5904acfe84b01ace83ede4bc77e2d3ad6738": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "account",
+              "type": "address"
+            }
+          ],
+          "name": "ShipperRemoved",
+          "type": "event",
+          "signature": "0x4098c33ee7259bdc6331fa574feb5904acfe84b01ace83ede4bc77e2d3ad6738"
+        }
+      },
       "links": {},
-      "address": "0xE5c950309dDF6044b52014f7875AE6c026da5bFb",
-      "transactionHash": "0xbd93fe44989332e48b63f72fabd8b6c02cca101894cb3ece7a3b393ae2983cba"
+      "address": "0x44E2cE9aC6d37c9a5AfEB87C4Ee4A9B57B3547b4",
+      "transactionHash": "0xe7f51d549f8e4ac749157aeaebf5095254a99bcb22f5a38cd8ea7a5125b5c5bf"
     }
   },
   "schemaVersion": "3.0.6",
-  "updatedAt": "2019-04-14T18:09:48.348Z",
+  "updatedAt": "2019-04-16T20:56:16.457Z",
   "devdoc": {
     "methods": {}
   },

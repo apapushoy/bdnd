@@ -2587,14 +2587,41 @@
       "transactionHash": "0x7fd38b5b0f34c33c5bbfe19822f1a63a3dd6e3644f120fe3f554b1940a62fd20"
     },
     "5777": {
-      "events": {},
+      "events": {
+        "0xcd118a02bd36f224f6f1b93812f78d2bbc2c2dc1bc0f60c176e3b4fe09f1483f": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "account",
+              "type": "address"
+            }
+          ],
+          "name": "CustomerAdded",
+          "type": "event",
+          "signature": "0xcd118a02bd36f224f6f1b93812f78d2bbc2c2dc1bc0f60c176e3b4fe09f1483f"
+        },
+        "0xb4c88a9c5cd906354abdd1cc29e4f94c6c4de90754fb80ce51e6a33417bc81b6": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "account",
+              "type": "address"
+            }
+          ],
+          "name": "CustomerRemoved",
+          "type": "event",
+          "signature": "0xb4c88a9c5cd906354abdd1cc29e4f94c6c4de90754fb80ce51e6a33417bc81b6"
+        }
+      },
       "links": {},
-      "address": "0xb3f9528C978fd819b5FA34dF1D7a95dac1715800",
-      "transactionHash": "0x8afe3ae0e8d40a329ba5e884bdf84415dae9d0f4bbcc403a85aaf87fa72737bb"
+      "address": "0xE3a6db4D9A0d4a7FEF0891c0ED4cCD3eF37d6a01",
+      "transactionHash": "0xbda28dcceb9e0a19b105bb3a1839a67b1711739c6550ad3706840bde9face1d3"
     }
   },
   "schemaVersion": "3.0.6",
-  "updatedAt": "2019-04-14T18:09:48.353Z",
+  "updatedAt": "2019-04-16T20:56:16.460Z",
   "devdoc": {
     "methods": {}
   },
