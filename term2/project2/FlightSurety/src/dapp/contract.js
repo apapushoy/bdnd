@@ -180,4 +180,13 @@ export default class Contract {
         .send({from: passengerAddr, value: this.web3.utils.toWei(premium, "ether")},
         (e, p)=>{callback(e, p)})
     }
+
+    pay(passengerAddr, callback) {
+        console.log(`pay: ${passengerAddr}`)
+        let payload = {
+            passenger: passengerAddr,
+        }
+        this.flightSuretyData.methods.pay().send({from: passengerAddr},
+        (e, p)=>{callback(e, p)})
+    }
 }

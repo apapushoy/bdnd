@@ -1,52 +1,22 @@
-# FlightSurety
+# FlightSuretyApp
+## Test instructions
+Start new terminals in the project directory and follow these steps:
+1. Launch ganache
+2. Launch `truffle console`
+3. In truffle, enter `migrate --reset`
+4. In new terminal enter `npm run server`
+5. Wait for oracles to register
+6. In new terminal enter `npm run dapp`
+7. Navigate to `localhost:8000`
+8. Wait for init to finish
+    * this will be indicated by the listing of available flights, airlines and passsengers.
+    * Should look like this:
+    ![](dapp_loaded.jpg)
 
-FlightSurety is a sample application project for Udacity's Blockchain course.
-
-## Install
-
-This repository contains Smart Contract code in Solidity (using Truffle), tests (also using Truffle), dApp scaffolding (using HTML, CSS and JS) and server app scaffolding.
-
-To install, download or clone the repo, then:
-
-`npm install`
-`truffle compile`
-
-## Develop Client
-
-To run truffle tests:
-
-`truffle test ./test/flightSurety.js`
-`truffle test ./test/oracles.js`
-
-To use the dapp:
-
-`truffle migrate`
-`npm run dapp`
-
-To view dapp:
-
-`http://localhost:8000`
-
-## Develop Server
-
-`npm run server`
-`truffle test ./test/oracles.js`
-
-## Deploy
-
-To build dapp for prod:
-`npm run dapp:prod`
-
-Deploy the contents of the ./dapp folder
-
-
-## Resources
-
-* [How does Ethereum work anyway?](https://medium.com/@preethikasireddy/how-does-ethereum-work-anyway-22d1df506369)
-* [BIP39 Mnemonic Generator](https://iancoleman.io/bip39/)
-* [Truffle Framework](http://truffleframework.com/)
-* [Ganache Local Blockchain](http://truffleframework.com/ganache/)
-* [Remix Solidity IDE](https://remix.ethereum.org/)
-* [Solidity Language Reference](http://solidity.readthedocs.io/en/v0.4.24/)
-* [Ethereum Blockchain Explorer](https://etherscan.io/)
-* [Web3Js Reference](https://github.com/ethereum/wiki/wiki/JavaScript-API)
+To request oracle responses, enter a flight number and click submit to Oracles.  
+To purchase a policy, enter:
+* airline address
+* flight
+* flight's departure time
+* passenger address
+* premium in ether

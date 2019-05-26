@@ -177,7 +177,7 @@ contract FlightSuretyApp {
         require(msg.value <= 1 ether, "must pay up to 1 ether to purchase");
         require(msg.value > 0 wei, "insufficient payment");
         require(data.isRegisteredFlight(airline, flight, time), "flight not registered");
-        // data.buy(airline, flight, time, msg.value.mul(15).div(10), msg.sender, msg.value);
+        data.buy(airline, flight, time, msg.value.mul(15).div(10), msg.sender, msg.value);
         emit PolicyPurchased(msg.sender, airline, flight, time);
     }
 

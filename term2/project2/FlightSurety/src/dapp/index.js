@@ -75,6 +75,19 @@ import './flightsurety.css';
             });
         })
 
+        DOM.elid('withdraw-payout').addEventListener('click', () => {
+            let pass = DOM.elid('passenger').value;
+            if (pass == '')
+            {
+                alert('must specify passenger')
+                return
+            }
+            // Write transaction
+            contract.pay(pass, (error, result) => {
+                display('Payout', 'Withdraw payout', [ { label: '', error: error, value: 'Paid out'} ]);
+            });
+        })
+
     });
 
 
