@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.4.24;
 
 // It's important to avoid vulnerabilities due to numeric overflow bugs
 // OpenZeppelin's SafeMath library, when used correctly, protects agains such bugs
@@ -160,7 +160,7 @@ contract FlightSuretyApp {
     */
     function registerFlight
                                 (
-                                    string flight,
+                                    string  flight,
                                     uint time
                                 )
                                 external
@@ -173,11 +173,12 @@ contract FlightSuretyApp {
         emit FlightRegistered(msg.sender, flight, time);
     }
 
-    function buy(address airline, string flight, uint time) public requireIsOperational payable {
+    function buy(address airline, string  flight, uint time) public requireIsOperational payable {
         require(msg.value <= 1 ether, "must pay up to 1 ether to purchase");
         require(msg.value > 0 wei, "insufficient payment");
         require(data.isRegisteredFlight(airline, flight, time), "flight not registered");
-        data.buy(airline, flight, time, msg.value.mul(15).div(10), msg.sender, msg.value);
+        uint payout = msg.value.mul(15).div(10);
+        data.buy(airline, flight, time, payout, msg.sender, msg.value);
         emit PolicyPurchased(msg.sender, airline, flight, time);
     }
 
@@ -200,7 +201,7 @@ contract FlightSuretyApp {
     function processFlightStatus
                                 (
                                     address airline,
-                                    string memory flight,
+                                    string  flight,
                                     uint256 timestamp,
                                     uint8 statusCode
                                 )
@@ -218,7 +219,7 @@ contract FlightSuretyApp {
     function fetchFlightStatus
                         (
                             address airline,
-                            string flight,
+                            string  flight,
                             uint256 timestamp
                         )
                         external
@@ -304,7 +305,7 @@ contract FlightSuretyApp {
                             )
                             view
                             external
-                            returns(uint8[3])
+                            returns(uint8[3] memory)
     {
         require(oracles[msg.sender].isRegistered, "Not registered as an oracle");
 
@@ -322,7 +323,7 @@ contract FlightSuretyApp {
                         (
                             uint8 index,
                             address airline,
-                            string flight,
+                            string  flight,
                             uint256 timestamp,
                             uint8 statusCode
                         )
@@ -353,7 +354,7 @@ contract FlightSuretyApp {
     function getFlightKey
                         (
                             address airline,
-                            string flight,
+                            string  flight,
                             uint256 timestamp
                         )
                         pure
@@ -369,9 +370,9 @@ contract FlightSuretyApp {
                                 address account
                             )
                             internal
-                            returns(uint8[3])
+                            returns(uint8[3] memory)
     {
-        uint8[3] memory indexes;
+        uint8[3]  memory indexes;
         indexes[0] = getRandomIndex(account);
 
         indexes[1] = indexes[0];
@@ -414,10 +415,10 @@ contract FlightSuretyApp {
 
 contract IFlightSuretyData {
     function registerAirline(address airline) external;
-    function registerFlight(address airline, string flight, uint time) external;
+    function registerFlight(address airline, string  flight, uint time) external;
     function addVote(address airline, address voter) external;
     function buy(address airline,
-        string flight,
+        string  flight,
         uint time,
         uint payout,
         address purchaser,
@@ -433,7 +434,7 @@ contract IFlightSuretyData {
     function creditInsurees
     (
         address airline,
-        string flight,
+        string  flight,
         uint time
     )
     external;
@@ -442,7 +443,7 @@ contract IFlightSuretyData {
 
     function hasVoted(address airline, address voter) external view returns(bool);
     function isRegisteredAirline(address airline) external view returns (bool);
-    function isRegisteredFlight(address airline, string flight, uint time) external view returns(bool);
+    function isRegisteredFlight(address airline, string  flight, uint time) external view returns(bool);
     function isFundedAirline(address airline) external view returns (bool);
     function numVotes(address airline) external view returns (uint votes);
     function numRegisteredAirlines() external view returns (uint);

@@ -150,8 +150,8 @@ contract('Flight Surety Tests', async (accounts) => {
 
       await config.flightSuretyApp.buy(accounts[1], "ABC123", 900, {from: accounts[7], value: web3.utils.toWei("0.7") });
       assert.equal(await config.flightSuretyData.getNumPoliciesHeld.call(accounts[7]), 1)
-      var res = await config.flightSuretyData.getPolicy.call(accounts[7], 0)
-      assert.equal(res[3], web3.utils.toWei("1.05")); // verify payout is 1.5x premium
+      var res = await config.flightSuretyData.getPolicyPayout.call(accounts[7], 0)
+      assert.equal(res, web3.utils.toWei("1.05")); // verify payout is 1.5x premium
   })
 
 

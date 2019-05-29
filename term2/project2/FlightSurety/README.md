@@ -9,7 +9,7 @@ Start new terminals in the project directory and follow these steps:
 6. In new terminal enter `npm run dapp`
 7. Navigate to `localhost:8000`
 8. Wait for init to finish
-    * this will be indicated by the listing of available flights, airlines and passsengers.
+    * this will be indicated by the listing of available flights, airlines and passengers.
     * Should look like this:
     ![](dapp_loaded.jpg)
 

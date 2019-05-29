@@ -19,7 +19,7 @@ import './flightsurety.css';
                 return {label: "Airline", value: addr}
             }))
 
-            display('Flights', 'Insurance can be taken out for these flights', contract.flights.map(flight => {
+            display('Flights', 'Insurance can be taken out for these flights. Format: <airline> -> <flight id> at <time>', contract.flights.map(flight => {
                 return { label: "Flight", value: (flight.airline + ' -> ' + flight.flight + ' at ' + flight.time) }
             }))
 
@@ -51,14 +51,14 @@ import './flightsurety.css';
                 alert('time required')
                 return
             }
-            let airline = DOM.elid('airline').value
-            if (airline == '')
+            let airlineAddr = DOM.elid('airline').value
+            if (airlineAddr == '')
             {
                 alert('airline required')
                 return
             }
-            let passenger = DOM.elid('passenger').value
-            if (passenger == '')
+            let passengerAddr = DOM.elid('passenger').value
+            if (passengerAddr == '')
             {
                 alert('passenger required')
                 return
@@ -70,7 +70,7 @@ import './flightsurety.css';
                 return
             }
             // Write transaction
-            contract.buy(passenger, airline, flight, time, prem, (error, result) => {
+            contract.buy(passengerAddr, airlineAddr, flight, time, prem, (error, result) => {
                 display('Purchase', 'Policy', [{value: "", error: error}])
             });
         })
@@ -88,6 +88,11 @@ import './flightsurety.css';
             });
         })
 
+        DOM.elid('test-purchase').addEventListener('click', () => {
+            contract.buy('0x2191eF87E392377ec08E7c08Eb105Ef5448eCED5', '0xf17f52151EbEF6C7334FAD080c5704D77216b732', 'AB100', 101, '1', (error, result) => {
+                display('Purchase', 'Policy', [{value: "", error: error}])
+            });
+        })
     });
 
 

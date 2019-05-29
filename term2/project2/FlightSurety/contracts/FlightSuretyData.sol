@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.4.24;
 
 import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 
@@ -39,7 +39,6 @@ contract FlightSuretyData {
     struct Policy {
         address purchaser;
         uint payout;
-        Flight flight;
     }
 
     mapping(bytes32 => Policy[]) private policies; // flight key -> policy
@@ -151,13 +150,13 @@ contract FlightSuretyData {
         return numRegistered;
     }
 
-    function registerFlight(address airline, string flight, uint time) external requireIsOperational
+    function registerFlight(address airline, string  flight, uint time) external requireIsOperational
     isAuthorised("registerFlight")
     {
         insurableFlights.push(getFlightKey(airline, flight, time));
     }
 
-    function isRegisteredFlight(address airline, string flight, uint time) external view returns(bool) {
+    function isRegisteredFlight(address airline, string  flight, uint time) external view returns(bool) {
         return isExisting(insurableFlights, getFlightKey(airline, flight, time));
     }
 
@@ -207,7 +206,7 @@ contract FlightSuretyData {
     function buy
                             (
                                 address airline,
-                                string flight,
+                                string  flight,
                                 uint time,
                                 uint payout,
                                 address purchaser,
@@ -218,23 +217,24 @@ contract FlightSuretyData {
                             requireIsOperational
                             isAuthorised("buy")
     {
-        Flight memory f = Flight(airline, flight, time);
-        Policy memory p = Policy(purchaser, payout, f);
-        policies[getFlightKey(f)].push(p);
-        policiesHeldByPurchaser[purchaser].push(p);
+        require(airline != address(0), "invalid airline address");
+        require(purchaser != address(0), "invalid purchaser address");
+        require(payout > 0, "invalid payout");
+        bytes32 key = getFlightKey(airline, flight, time);
         funds = funds.add(premium);
+
+        // these lines cause a revert in the dapp
+        policies[key].push(Policy(purchaser, payout));
+        policiesHeldByPurchaser[purchaser].push(Policy(purchaser, payout));
     }
 
     function getNumPoliciesHeld(address holder) external view returns(uint) {
         return policiesHeldByPurchaser[holder].length;
     }
 
-    function getPolicy(address holder, uint index) external view
-    returns(address airline, string flight, uint time, uint payout) {
+    function getPolicyPayout(address holder, uint index) external view
+    returns(uint payout) {
         Policy memory p = policiesHeldByPurchaser[holder][index];
-        airline = p.flight.airline;
-        flight = p.flight.flight;
-        time = p.flight.time;
         payout = p.payout;
     }
 
@@ -244,7 +244,7 @@ contract FlightSuretyData {
     function creditInsurees
                                 (
                                     address airline,
-                                    string flight,
+                                    string  flight,
                                     uint time
                                 )
                                 external
