@@ -1,6 +1,7 @@
 # FlightSuretyApp
 ## Test instructions
 Start new terminals in the project directory and follow these steps:
+0. Run `npm install`
 1. Launch ganache
 2. Launch `truffle console`
 3. In truffle, enter `migrate --reset`
