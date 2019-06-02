@@ -7,7 +7,7 @@ export default class Contract {
     constructor(network, callback) {
 
         let config = Config[network];
-        this.web3 = new Web3(new Web3.providers.HttpProvider(config.url));
+        this.web3 = new Web3(new Web3.providers.WebsocketProvider(config.url.replace('http:', 'ws:')));
         this.flightSuretyApp = new this.web3.eth.Contract(FlightSuretyApp.abi, config.appAddress);
         this.flightSuretyData = new this.web3.eth.Contract(FlightSuretyData.abi, config.dataAddress);
         this.owner = null;
@@ -177,7 +177,7 @@ export default class Contract {
             premium: premium
         }
         this.flightSuretyApp.methods.buy(airline, flight, time)
-        .send({from: passengerAddr, value: this.web3.utils.toWei(premium, "ether")},
+        .send({from: passengerAddr, value: this.web3.utils.toWei(premium, "ether"), gas: 9999999},
         (e, p)=>{callback(e, p)})
     }
 

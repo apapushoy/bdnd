@@ -223,7 +223,7 @@ contract FlightSuretyData {
         bytes32 key = getFlightKey(airline, flight, time);
         funds = funds.add(premium);
 
-        // these lines cause a revert in the dapp
+        policies[key].push(Policy(purchaser, payout));
         policies[key].push(Policy(purchaser, payout));
         policiesHeldByPurchaser[purchaser].push(Policy(purchaser, payout));
     }
@@ -260,6 +260,8 @@ contract FlightSuretyData {
             if (holder == address(0))
                 continue;
             uint payout = toPayout[i].payout;
+            if (payout == 0)
+                continue;
             if (payout > funds)
                 break;
             pendingPayouts[holder] = pendingPayouts[holder].add(payout);
