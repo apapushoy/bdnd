@@ -32,7 +32,7 @@ contract Ownable {
     }
 
     function assignOwner(address newOwner) private {
-        owner_ = newOwner;
+        _owner = newOwner;
         emit NewOwner(_owner);
     }
 }
@@ -228,8 +228,8 @@ contract ERC721 is Pausable, ERC165 {
     // @dev Internal function to mint a new token
     // TIP: remember the functions to use for Counters. you can refresh yourself with the link above
     function _mint(address to, uint256 tokenId) internal {
-        require(_exists(tokenId), "token already exists");
-        require(to == address(0), "invalid TO address");
+        require(!_exists(tokenId), "token already exists");
+        require(to != address(0), "invalid TO address");
         _tokenOwner[tokenId] = to;
         _ownedTokensCount[to].increment();
         emit Transfer(address(0), to, tokenId);
@@ -472,15 +472,15 @@ contract ERC721Metadata is ERC721Enumerable, usingOraclize {
         _registerInterface(_INTERFACE_ID_ERC721_METADATA);
     }
 
-    function getName() external returns (string) {
+    function getName() external view returns (string memory) {
         return _name;
     }
 
-    function getSymbol() external returns (string) {
+    function getSymbol() external view returns (string memory) {
         return _symbol;
     }
 
-    function getBaseTokenURI() external returns (string) {
+    function getBaseTokenURI() external view returns (string memory) {
         return _baseTokenURI;
     }
 
@@ -515,7 +515,7 @@ contract CustomERC721Token is ERC721Metadata {
 
     function mint(address to, uint tokenId)
     public
-    ownerOnly
+    onlyOwner
     whenNotPaused
     returns(bool) {
         super._mint(to, tokenId);
