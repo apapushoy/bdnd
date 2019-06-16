@@ -1,59 +1,57 @@
-pragma solidity >=0.4.21 <0.6.0;
+pragma solidity ^0.5.0;
 
-// TODO define a contract call to the zokrates generated solidity contract <Verifier> or <renamedVerifier>
-
-
-
-// TODO define another contract named SolnSquareVerifier that inherits from your ERC721Mintable class
+import "./ERC721Mintable.sol";
 
 
-
-// TODO define a solutions struct that can hold an index & an address
-
-
-// TODO define an array of the above struct
-
-
-// TODO define a mapping to store unique solutions submitted
-
-
-
-// TODO Create an event to emit when a solution is added
+contract IVerifier {
+    function verifyTx(
+        uint[2] memory a,
+        uint[2][2] memory b,
+        uint[2] memory c,
+        uint[2] memory input
+    ) public returns (bool r);
+}
 
 
+contract SolnSquareVerifier is CustomERC721Token {
+    IVerifier private _verifier;
 
-// TODO Create a function to add the solutions to the array and emit the event
+    struct Solution {
+        address owner;
+        bool minted;
 
+        uint[2] a;
+        uint[2][2] b;
+        uint[2] c;
+        uint[2] input;
+    }
 
+    mapping(bytes32 => Solution) private _uniqueSolutions;
 
-// TODO Create a function to mint new NFT only after the solution has been verified
-//  - make sure the solution is unique (has not been used before)
-//  - make sure you handle metadata as well as tokenSuplly
+    event SolutionAdded(address owner, bytes32 key);
 
-  
+    constructor(address verifierContract) public {
+        _verifier = IVerifier(verifierContract);
+    }
 
+    function addSolution(uint[2] memory a,
+        uint[2][2] memory b,
+        uint[2] memory c,
+        uint[2] memory input) public whenNotPaused {
+        bytes32 key = keccak256(abi.encodePacked(a, b, c, input));
+        require(_uniqueSolutions[key].owner == address(0), "only new solutions can be added");
+        Solution memory s = Solution(msg.sender, false, a, b, c, input);
+        _uniqueSolutions[key] = s;
+        emit SolutionAdded(msg.sender, key);
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    function issueToken(bytes32 key) public whenNotPaused {
+        Solution memory s = _uniqueSolutions[key];
+        require(s.owner != address(0), "solution must be submitted before minting");
+        require(!s.minted, "token already minted for this solution");
+        require(_verifier.verifyTx(s.a, s.b, s.c, s.input), "invalid solution");
+        uint256 tokenId = super.totalSupply();
+        super.mint(s.owner, tokenId);
+        _uniqueSolutions[key].minted = true;
+    }
+}
