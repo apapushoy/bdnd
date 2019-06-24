@@ -1,0 +1,3 @@
+rinkeby
+SolnSquareVerifier @ 0xed1E39bE64786be0a208829bFBfb2466A68D32d5
+SquareVerifier @ 0x8004f965bf6cD7E941736d43c80581b51014a151
